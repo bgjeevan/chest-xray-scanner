@@ -25,9 +25,17 @@ LABELS = [
 ]
 
 MODEL_PATH = 'pretrained_model.h5'
+GDRIVE_ID = '1qTEW8ftNXU7wIHaGIZVIrIYEWEaGwkGQ'
 
 @st.cache_resource
 def load_model():
+    if not os.path.exists(MODEL_PATH):
+        with st.spinner("⬇️ Downloading AI model for the first time... please wait"):
+            gdown.download(
+                f'https://drive.google.com/uc?id={GDRIVE_ID}',
+                MODEL_PATH,
+                quiet=False
+            )
     base_model = DenseNet121(
         include_top=False,
         weights=None,
