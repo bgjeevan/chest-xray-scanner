@@ -21,215 +21,191 @@ st.set_page_config(
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
     * { font-family: 'Inter', sans-serif; }
-
-    .stApp {
-        background-color: #0F1117;
-        color: #E8EAF0;
-    }
+    .stApp { background-color: #0F1117; color: #E8EAF0; }
+    footer { display: none; }
+    #MainMenu { visibility: hidden; }
+    header { visibility: hidden; }
 
     .main-header {
-        background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
-        border-bottom: 1px solid #2a3040;
-        padding: 2rem 3rem;
+        background: #13161f;
+        border-bottom: 1px solid #1e2535;
+        padding: 1.8rem 2rem;
         margin: -1rem -1rem 2rem -1rem;
     }
-
     .header-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(59, 130, 246, 0.15);
-        border: 1px solid rgba(59, 130, 246, 0.3);
+        background: rgba(59, 130, 246, 0.12);
+        border: 1px solid rgba(59, 130, 246, 0.25);
         color: #60a5fa;
-        padding: 4px 12px;
+        padding: 3px 12px;
         border-radius: 20px;
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
         text-transform: uppercase;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
     }
-
     .header-title {
-        font-size: 2.2rem;
+        font-size: 2rem;
         font-weight: 700;
         color: #f0f4ff;
         margin: 0;
         letter-spacing: -0.5px;
     }
-
     .header-subtitle {
-        color: #8892a4;
-        font-size: 0.95rem;
-        margin-top: 6px;
-        font-weight: 400;
+        color: #6b7a99;
+        font-size: 0.9rem;
+        margin-top: 5px;
     }
 
-    .upload-zone {
-        background: #1a1f2e;
-        border: 2px dashed #2a3a5c;
-        border-radius: 16px;
-        padding: 2.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
+    .primary-finding {
+        background: #13161f;
+        border: 1px solid #1e2535;
+        border-left: 3px solid #ef4444;
+        border-radius: 10px;
+        padding: 1.1rem 1.4rem;
         margin-bottom: 1.5rem;
-    }
-
-    .upload-zone:hover {
-        border-color: #3b82f6;
-        background: #1e2638;
-    }
-
-    .result-card {
-        background: #1a1f2e;
-        border: 1px solid #2a3040;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
-    .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #c8d0e0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #2a3040;
-    }
-
-    .finding-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #1e2535;
     }
-
-    .finding-row:last-child { border-bottom: none; }
-
-    .finding-name {
-        font-size: 0.9rem;
-        color: #c8d0e0;
-        font-weight: 500;
-    }
-
-    .badge-detected {
-        background: rgba(239, 68, 68, 0.15);
-        color: #f87171;
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
+    .pf-label {
+        font-size: 10px;
+        color: #ef4444;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.2px;
+        font-weight: 700;
+        margin-bottom: 4px;
     }
-
-    .badge-normal {
-        background: rgba(34, 197, 94, 0.1);
-        color: #4ade80;
-        border: 1px solid rgba(34, 197, 94, 0.2);
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .score-text {
-        font-size: 0.85rem;
-        color: #8892a4;
-        min-width: 45px;
-        text-align: right;
-    }
-
-    .top-finding-card {
-        background: rgba(239, 68, 68, 0.08);
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        border-radius: 12px;
-        padding: 1.2rem 1.5rem;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .top-finding-label {
-        font-size: 0.75rem;
-        color: #f87171;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-    }
-
-    .top-finding-value {
+    .pf-value {
         font-size: 1.3rem;
         font-weight: 700;
         color: #fff;
     }
-
-    .confidence-chip {
-        background: rgba(239, 68, 68, 0.15);
+    .pf-badge {
+        background: rgba(239,68,68,0.12);
         color: #f87171;
-        padding: 4px 12px;
+        border: 1px solid rgba(239,68,68,0.25);
+        padding: 5px 14px;
         border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .img-container {
+        background: #13161f;
+        border: 1px solid #1e2535;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .img-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid #1e2535;
+        font-size: 10px;
+        font-weight: 700;
+        color: #6b7a99;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+    }
+    .img-body { padding: 12px; }
+
+    .results-header {
+        font-size: 10px;
+        font-weight: 700;
+        color: #6b7a99;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 1rem;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #1e2535;
+    }
+
+    .finding-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #13161f;
+    }
+    .finding-item:last-child { border-bottom: none; }
+    .finding-dot-red {
+        width: 7px; height: 7px;
+        background: #ef4444;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .finding-dot-green {
+        width: 7px; height: 7px;
+        background: #22c55e;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .finding-label {
         font-size: 0.85rem;
+        color: #c8d0e0;
+        font-weight: 500;
+        min-width: 130px;
+    }
+    .bar-track {
+        flex: 1;
+        background: #1a1f2e;
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+    }
+    .bar-fill-red {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #dc2626, #f87171);
+    }
+    .bar-fill-green {
+        height: 100%;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #15803d, #4ade80);
+    }
+    .finding-score {
+        font-size: 0.8rem;
         font-weight: 600;
+        min-width: 38px;
+        text-align: right;
+    }
+    .score-red { color: #f87171; }
+    .score-green { color: #4ade80; }
+
+    .section-card {
+        background: #13161f;
+        border: 1px solid #1e2535;
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        margin-bottom: 1rem;
     }
 
     .disclaimer-box {
-        background: rgba(234, 179, 8, 0.08);
-        border: 1px solid rgba(234, 179, 8, 0.2);
+        background: rgba(234,179,8,0.06);
+        border: 1px solid rgba(234,179,8,0.18);
         border-radius: 10px;
-        padding: 1rem 1.2rem;
+        padding: 0.9rem 1.2rem;
         margin-top: 1.5rem;
     }
-
     .disclaimer-text {
         color: #fbbf24;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
         font-weight: 500;
         margin: 0;
     }
 
-    .img-label {
-        font-size: 0.8rem;
-        color: #8892a4;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-weight: 600;
-        margin-bottom: 8px;
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: #3a4258;
     }
-
-    .stProgress > div > div > div {
-        background: linear-gradient(90deg, #3b82f6, #60a5fa);
-        border-radius: 10px;
-    }
-
-    .stProgress > div > div {
-        background: #1e2535;
-        border-radius: 10px;
-    }
-
-    div[data-testid="stFileUploader"] {
-        background: #1a1f2e;
-        border: 2px dashed #2a3a5c;
-        border-radius: 16px;
-        padding: 1rem;
-    }
-
-    .stSpinner > div {
-        border-top-color: #3b82f6 !important;
-    }
-
-    footer { display: none; }
-    #MainMenu { visibility: hidden; }
-    header { visibility: hidden; }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .empty-title { font-size: 1rem; color: #6b7a99; font-weight: 500; }
+    .empty-sub { font-size: 0.82rem; color: #3a4258; margin-top: 6px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -247,10 +223,7 @@ GDRIVE_ID = '1qTEW8ftNXU7wIHaGIZVIrIYEWEaGwkGQ'
 def load_model():
     if not os.path.exists(MODEL_PATH):
         with st.spinner("Downloading AI model..."):
-            gdown.download(
-                f'https://drive.google.com/uc?id={GDRIVE_ID}',
-                MODEL_PATH, quiet=False
-            )
+            gdown.download(f'https://drive.google.com/uc?id={GDRIVE_ID}', MODEL_PATH, quiet=False)
     base_model = DenseNet121(include_top=False, weights=None, input_shape=(224, 224, 3))
     x = GlobalAveragePooling2D()(base_model.output)
     predictions = Dense(14, activation='sigmoid')(x)
@@ -284,20 +257,16 @@ def overlay_heatmap(img_path, heatmap):
     superimposed = cv2.addWeighted(original_img, 0.55, heatmap_colored, 0.45, 0)
     return cv2.cvtColor(superimposed, cv2.COLOR_BGR2RGB)
 
-# Header
+# ── Header ──
 st.markdown("""
 <div class="main-header">
     <div class="header-badge">AI-Powered · DenseNet121 · 14 Conditions</div>
     <h1 class="header-title">🫁 RadScan AI</h1>
-    <p class="header-subtitle">Upload a chest X-ray for instant AI-assisted analysis across 14 pulmonary conditions</p>
+    <p class="header-subtitle">Upload a chest X-ray for instant AI-assisted analysis</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Upload
-uploaded_file = st.file_uploader(
-    "Upload Chest X-Ray (JPG, JPEG, PNG)",
-    type=['jpg', 'jpeg', 'png']
-)
+uploaded_file = st.file_uploader("Upload Chest X-Ray (JPG, JPEG, PNG)", type=['jpg', 'jpeg', 'png'])
 
 if uploaded_file is not None:
     temp_path = "temp_xray.jpg"
@@ -313,53 +282,62 @@ if uploaded_file is not None:
         heatmap = generate_heatmap(model, img_array, top_index)
         result_img = overlay_heatmap(temp_path, heatmap)
 
-    # Top finding banner
+    # Primary finding
     st.markdown(f"""
-    <div class="top-finding-card">
-        <div style="flex:1">
-            <div class="top-finding-label">Primary Finding</div>
-            <div class="top-finding-value">{LABELS[top_index]}</div>
+    <div class="primary-finding">
+        <div>
+            <div class="pf-label">Primary Finding</div>
+            <div class="pf-value">{LABELS[top_index]}</div>
         </div>
-        <div class="confidence-chip">{preds[top_index]*100:.1f}% confidence</div>
+        <div class="pf-badge">{preds[top_index]*100:.1f}% confidence</div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Images side by side
+    # Images — smaller and contained
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="img-label">Original X-Ray</div>', unsafe_allow_html=True)
-        st.image(uploaded_file, use_column_width=True)
+        st.markdown('<div class="img-container"><div class="img-header">Original X-Ray</div><div class="img-body">', unsafe_allow_html=True)
+        st.image(uploaded_file, width=320)
+        st.markdown('</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="img-label">AI Heatmap — {LABELS[top_index]}</div>', unsafe_allow_html=True)
-        st.image(result_img, use_column_width=True)
+        st.markdown(f'<div class="img-container"><div class="img-header">AI Heatmap — {LABELS[top_index]}</div><div class="img-body">', unsafe_allow_html=True)
+        st.image(result_img, width=320)
+        st.markdown('</div></div>', unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Results table
-    st.markdown('<div class="section-title">Full Scan Results</div>', unsafe_allow_html=True)
-
-    detected = [(l, s) for l, s in zip(LABELS, preds) if s > 0.5]
-    not_detected = [(l, s) for l, s in zip(LABELS, preds) if s <= 0.5]
+    # Results
+    detected = sorted([(l, s) for l, s in zip(LABELS, preds) if s > 0.5], key=lambda x: x[1], reverse=True)
+    not_detected = sorted([(l, s) for l, s in zip(LABELS, preds) if s <= 0.5], key=lambda x: x[1], reverse=True)
 
     col_a, col_b = st.columns(2)
 
     with col_a:
-        st.markdown(f"**Detected ({len(detected)})**")
-        for label, score in sorted(detected, key=lambda x: x[1], reverse=True):
-            c1, c2, c3 = st.columns([3, 4, 1])
-            c1.markdown(f'<span class="finding-name">{label}</span>', unsafe_allow_html=True)
-            c2.progress(float(score))
-            c3.markdown(f'<span class="score-text">{score*100:.0f}%</span>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-card"><div class="results-header">Detected ({len(detected)})</div>', unsafe_allow_html=True)
+        for label, score in detected:
+            pct = int(score * 100)
+            st.markdown(f"""
+            <div class="finding-item">
+                <div class="finding-dot-red"></div>
+                <div class="finding-label">{label}</div>
+                <div class="bar-track"><div class="bar-fill-red" style="width:{pct}%"></div></div>
+                <div class="finding-score score-red">{pct}%</div>
+            </div>
+            """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with col_b:
-        st.markdown(f"**Not Detected ({len(not_detected)})**")
-        for label, score in sorted(not_detected, key=lambda x: x[1], reverse=True):
-            c1, c2, c3 = st.columns([3, 4, 1])
-            c1.markdown(f'<span style="color:#4ade80;font-size:0.9rem">{label}</span>', unsafe_allow_html=True)
-            c2.progress(float(score))
-            c3.markdown(f'<span class="score-text">{score*100:.0f}%</span>', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-card"><div class="results-header">Not Detected ({len(not_detected)})</div>', unsafe_allow_html=True)
+        for label, score in not_detected:
+            pct = int(score * 100)
+            st.markdown(f"""
+            <div class="finding-item">
+                <div class="finding-dot-green"></div>
+                <div class="finding-label">{label}</div>
+                <div class="bar-track"><div class="bar-fill-green" style="width:{pct}%"></div></div>
+                <div class="finding-score score-green">{pct}%</div>
+            </div>
+            """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    # Disclaimer
     st.markdown("""
     <div class="disclaimer-box">
         <p class="disclaimer-text">⚠️ For clinical assistance only. This AI analysis must be reviewed and confirmed by a qualified radiologist before any medical decision is made.</p>
@@ -371,9 +349,9 @@ if uploaded_file is not None:
 
 else:
     st.markdown("""
-    <div style="text-align:center; padding: 4rem 2rem; color: #4a5568;">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">🫁</div>
-        <div style="font-size: 1.1rem; color: #8892a4; font-weight: 500;">Upload a chest X-ray to begin analysis</div>
-        <div style="font-size: 0.85rem; color: #4a5568; margin-top: 8px;">Supports JPG, JPEG, PNG formats</div>
+    <div class="empty-state">
+        <div class="empty-icon">🫁</div>
+        <div class="empty-title">Upload a chest X-ray to begin analysis</div>
+        <div class="empty-sub">Supports JPG, JPEG, PNG formats</div>
     </div>
     """, unsafe_allow_html=True)
