@@ -9,7 +9,6 @@ from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
 import os
 import gdown
-from PIL import Image
 
 st.set_page_config(
     page_title="RadScan AI — Chest X-Ray Analysis",
@@ -20,192 +19,237 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    * { font-family: 'Inter', sans-serif; }
-    .stApp { background-color: #0F1117; color: #E8EAF0; }
-    footer { display: none; }
-    #MainMenu { visibility: hidden; }
-    header { visibility: hidden; }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
-    .main-header {
-        background: #13161f;
-        border-bottom: 1px solid #1e2535;
-        padding: 1.8rem 2rem;
-        margin: -1rem -1rem 2rem -1rem;
+    * { font-family: 'DM Sans', sans-serif !important; }
+
+    .stApp { background-color: #080c14; color: #e2e8f0; }
+    footer, #MainMenu, header { display: none !important; visibility: hidden !important; }
+
+    /* ── Header ── */
+    .radscan-header {
+        background: linear-gradient(180deg, #0d1220 0%, #080c14 100%);
+        border-bottom: 1px solid #1a2235;
+        padding: 2.5rem 3rem 2rem;
+        margin: -1rem -1rem 2.5rem -1rem;
     }
-    .header-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(59, 130, 246, 0.12);
-        border: 1px solid rgba(59, 130, 246, 0.25);
+    .radscan-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(59,130,246,0.1);
+        border: 1px solid rgba(59,130,246,0.2);
         color: #60a5fa;
-        padding: 3px 12px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.8px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 11px; font-weight: 600;
+        letter-spacing: 1.2px; text-transform: uppercase;
+        margin-bottom: 14px;
     }
-    .header-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #f0f4ff;
-        margin: 0;
-        letter-spacing: -0.5px;
+    .radscan-title {
+        font-size: 2.8rem; font-weight: 700;
+        color: #f8faff; margin: 0; letter-spacing: -1px;
+        line-height: 1.1;
     }
-    .header-subtitle {
-        color: #6b7a99;
-        font-size: 0.9rem;
-        margin-top: 5px;
+    .radscan-sub {
+        color: #64748b; font-size: 1.05rem;
+        margin-top: 8px; font-weight: 400;
     }
 
-    .primary-finding {
-        background: #13161f;
-        border: 1px solid #1e2535;
-        border-left: 3px solid #ef4444;
-        border-radius: 10px;
-        padding: 1.1rem 1.4rem;
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
+    /* ── Upload ── */
+    div[data-testid="stFileUploader"] {
+        background: #0d1220 !important;
+        border: 2px dashed #1e3a5f !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 2rem;
+        transition: border-color 0.3s;
+    }
+    div[data-testid="stFileUploader"]:hover {
+        border-color: #3b82f6 !important;
+    }
+    div[data-testid="stFileUploader"] label {
+        font-size: 1rem !important;
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+    }
+
+    /* ── Primary Finding ── */
+    .pf-card {
+        background: #0d1220;
+        border: 1px solid #1a2235;
+        border-left: 4px solid #ef4444;
+        border-radius: 14px;
+        padding: 1.4rem 1.8rem;
+        margin-bottom: 2rem;
+        display: flex; align-items: center;
         justify-content: space-between;
     }
     .pf-label {
-        font-size: 10px;
-        color: #ef4444;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        font-weight: 700;
-        margin-bottom: 4px;
+        font-size: 11px; color: #ef4444;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        font-weight: 700; margin-bottom: 6px;
     }
     .pf-value {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #fff;
+        font-size: 1.8rem; font-weight: 700; color: #fff;
+        letter-spacing: -0.5px;
     }
     .pf-badge {
         background: rgba(239,68,68,0.12);
         color: #f87171;
         border: 1px solid rgba(239,68,68,0.25);
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 700;
+        padding: 8px 20px; border-radius: 24px;
+        font-size: 1rem; font-weight: 700;
+        letter-spacing: -0.3px;
     }
 
-    .img-container {
-        background: #13161f;
-        border: 1px solid #1e2535;
-        border-radius: 12px;
+    /* ── Image Cards ── */
+    .img-card {
+        background: #0d1220;
+        border: 1px solid #1a2235;
+        border-radius: 16px;
         overflow: hidden;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
     }
-    .img-header {
-        padding: 10px 14px;
-        border-bottom: 1px solid #1e2535;
-        font-size: 10px;
-        font-weight: 700;
-        color: #6b7a99;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
+    .img-card-header {
+        padding: 12px 18px;
+        border-bottom: 1px solid #1a2235;
+        font-size: 11px; font-weight: 700;
+        color: #475569;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        display: flex; align-items: center; gap: 8px;
     }
-    .img-body { padding: 12px; }
-
-    .results-header {
-        font-size: 10px;
-        font-weight: 700;
-        color: #6b7a99;
-        text-transform: uppercase;
-        letter-spacing: 1.2px;
-        margin-bottom: 1rem;
-        padding-bottom: 8px;
-        border-bottom: 1px solid #1e2535;
+    .img-card-dot-white { width: 7px; height: 7px; background: #94a3b8; border-radius: 50%; }
+    .img-card-dot-red { width: 7px; height: 7px; background: #ef4444; border-radius: 50%; }
+    .img-card-body {
+        padding: 20px;
+        display: flex; justify-content: center;
+        background: #060910;
     }
-
-    .finding-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 0;
-        border-bottom: 1px solid #13161f;
-    }
-    .finding-item:last-child { border-bottom: none; }
-    .finding-dot-red {
-        width: 7px; height: 7px;
-        background: #ef4444;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-    .finding-dot-green {
-        width: 7px; height: 7px;
-        background: #22c55e;
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-    .finding-label {
-        font-size: 0.85rem;
-        color: #c8d0e0;
-        font-weight: 500;
-        min-width: 130px;
-    }
-    .bar-track {
-        flex: 1;
-        background: #1a1f2e;
-        border-radius: 4px;
-        height: 6px;
-        overflow: hidden;
-    }
-    .bar-fill-red {
-        height: 100%;
-        border-radius: 4px;
-        background: linear-gradient(90deg, #dc2626, #f87171);
-    }
-    .bar-fill-green {
-        height: 100%;
-        border-radius: 4px;
-        background: linear-gradient(90deg, #15803d, #4ade80);
-    }
-    .finding-score {
-        font-size: 0.8rem;
-        font-weight: 600;
-        min-width: 38px;
-        text-align: right;
-    }
-    .score-red { color: #f87171; }
-    .score-green { color: #4ade80; }
-
-    .section-card {
-        background: #13161f;
-        border: 1px solid #1e2535;
-        border-radius: 12px;
-        padding: 1.2rem 1.4rem;
-        margin-bottom: 1rem;
-    }
-
-    .disclaimer-box {
-        background: rgba(234,179,8,0.06);
-        border: 1px solid rgba(234,179,8,0.18);
+    .img-card-body img {
         border-radius: 10px;
-        padding: 0.9rem 1.2rem;
-        margin-top: 1.5rem;
+        max-width: 100%;
+    }
+
+    /* ── Results Section ── */
+    .results-card {
+        background: #0d1220;
+        border: 1px solid #1a2235;
+        border-radius: 16px;
+        padding: 1.6rem 1.8rem;
+        margin-bottom: 1rem;
+    }
+    .results-title {
+        font-size: 13px; font-weight: 700;
+        color: #475569;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        margin-bottom: 1.4rem;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #1a2235;
+        display: flex; align-items: center;
+        justify-content: space-between;
+    }
+    .count-badge-red {
+        background: rgba(239,68,68,0.1);
+        color: #f87171;
+        border: 1px solid rgba(239,68,68,0.2);
+        padding: 2px 10px; border-radius: 20px;
+        font-size: 12px; font-weight: 700;
+    }
+    .count-badge-green {
+        background: rgba(34,197,94,0.08);
+        color: #4ade80;
+        border: 1px solid rgba(34,197,94,0.15);
+        padding: 2px 10px; border-radius: 20px;
+        font-size: 12px; font-weight: 700;
+    }
+
+    /* ── Animated Bar Items ── */
+    .finding-row {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid #0d1220;
+        opacity: 0;
+        animation: fadeSlideIn 0.5s ease forwards;
+    }
+    .finding-row:last-child { border-bottom: none; }
+
+    @keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .f-dot-red { width: 8px; height: 8px; background: #ef4444; border-radius: 50%; flex-shrink: 0; }
+    .f-dot-green { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; flex-shrink: 0; }
+
+    .f-name {
+        font-size: 0.95rem; font-weight: 500;
+        color: #cbd5e1; min-width: 145px;
+    }
+
+    .f-bar-track {
+        flex: 1; height: 7px;
+        background: #1a2235;
+        border-radius: 10px; overflow: hidden;
+    }
+    .f-bar-red {
+        height: 100%; border-radius: 10px;
+        background: linear-gradient(90deg, #b91c1c, #f87171);
+        width: 0%;
+        animation: growBar 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .f-bar-green {
+        height: 100%; border-radius: 10px;
+        background: linear-gradient(90deg, #166534, #4ade80);
+        width: 0%;
+        animation: growBar 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    @keyframes growBar {
+        from { width: 0%; }
+        to { width: var(--target-width); }
+    }
+
+    .f-score-red {
+        font-size: 0.9rem; font-weight: 700;
+        color: #f87171; min-width: 42px; text-align: right;
+        font-family: 'DM Mono', monospace !important;
+    }
+    .f-score-green {
+        font-size: 0.9rem; font-weight: 700;
+        color: #4ade80; min-width: 42px; text-align: right;
+        font-family: 'DM Mono', monospace !important;
+    }
+
+    /* ── Disclaimer ── */
+    .disclaimer {
+        background: rgba(234,179,8,0.05);
+        border: 1px solid rgba(234,179,8,0.15);
+        border-radius: 12px;
+        padding: 1rem 1.4rem;
+        margin-top: 2rem;
+        display: flex; align-items: flex-start; gap: 10px;
     }
     .disclaimer-text {
-        color: #fbbf24;
-        font-size: 0.8rem;
-        font-weight: 500;
-        margin: 0;
+        color: #ca8a04; font-size: 0.88rem;
+        font-weight: 500; line-height: 1.5; margin: 0;
     }
 
+    /* ── Empty State ── */
     .empty-state {
         text-align: center;
-        padding: 5rem 2rem;
-        color: #3a4258;
+        padding: 6rem 2rem;
     }
-    .empty-icon { font-size: 3.5rem; margin-bottom: 1rem; }
-    .empty-title { font-size: 1rem; color: #6b7a99; font-weight: 500; }
-    .empty-sub { font-size: 0.82rem; color: #3a4258; margin-top: 6px; }
+    .empty-icon { font-size: 4rem; margin-bottom: 1.2rem; }
+    .empty-title { font-size: 1.2rem; color: #64748b; font-weight: 600; }
+    .empty-sub { font-size: 0.9rem; color: #334155; margin-top: 8px; }
+
+    /* Animation delays for staggered effect */
+    .finding-row:nth-child(1) { animation-delay: 0.05s; }
+    .finding-row:nth-child(2) { animation-delay: 0.1s; }
+    .finding-row:nth-child(3) { animation-delay: 0.15s; }
+    .finding-row:nth-child(4) { animation-delay: 0.2s; }
+    .finding-row:nth-child(5) { animation-delay: 0.25s; }
+    .finding-row:nth-child(6) { animation-delay: 0.3s; }
+    .finding-row:nth-child(7) { animation-delay: 0.35s; }
+    .finding-row:nth-child(8) { animation-delay: 0.4s; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -251,18 +295,32 @@ def generate_heatmap(model, img_array, pred_index):
 
 def overlay_heatmap(img_path, heatmap):
     original_img = cv2.imread(img_path)
-    original_img = cv2.resize(original_img, (224, 224))
-    heatmap_resized = cv2.resize(np.array(heatmap), (224, 224))
+    original_img = cv2.resize(original_img, (400, 400))
+    heatmap_resized = cv2.resize(np.array(heatmap), (400, 400))
     heatmap_colored = cv2.applyColorMap(np.uint8(255 * heatmap_resized), cv2.COLORMAP_JET)
     superimposed = cv2.addWeighted(original_img, 0.55, heatmap_colored, 0.45, 0)
     return cv2.cvtColor(superimposed, cv2.COLOR_BGR2RGB)
 
+def make_bar_row(label, score, color):
+    pct = int(score * 100)
+    dot = f'<div class="f-dot-{color}"></div>'
+    bar = f'<div class="f-bar-{color}" style="--target-width:{pct}%"></div>'
+    score_html = f'<div class="f-score-{color}">{pct}%</div>'
+    return f"""
+    <div class="finding-row">
+        {dot}
+        <div class="f-name">{label}</div>
+        <div class="f-bar-track">{bar}</div>
+        {score_html}
+    </div>
+    """
+
 # ── Header ──
 st.markdown("""
-<div class="main-header">
-    <div class="header-badge">AI-Powered · DenseNet121 · 14 Conditions</div>
-    <h1 class="header-title">🫁 RadScan AI</h1>
-    <p class="header-subtitle">Upload a chest X-ray for instant AI-assisted analysis</p>
+<div class="radscan-header">
+    <div class="radscan-badge">AI-Powered · DenseNet121 · 14 Conditions</div>
+    <div class="radscan-title">🫁 RadScan AI</div>
+    <div class="radscan-sub">Upload a chest X-ray for instant AI-assisted pulmonary analysis</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -282,9 +340,9 @@ if uploaded_file is not None:
         heatmap = generate_heatmap(model, img_array, top_index)
         result_img = overlay_heatmap(temp_path, heatmap)
 
-    # Primary finding
+    # Primary Finding
     st.markdown(f"""
-    <div class="primary-finding">
+    <div class="pf-card">
         <div>
             <div class="pf-label">Primary Finding</div>
             <div class="pf-value">{LABELS[top_index]}</div>
@@ -293,15 +351,30 @@ if uploaded_file is not None:
     </div>
     """, unsafe_allow_html=True)
 
-    # Images — smaller and contained
+    # Images — centered and bigger
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<div class="img-container"><div class="img-header">Original X-Ray</div><div class="img-body">', unsafe_allow_html=True)
-        st.image(uploaded_file, width=320)
+        st.markdown("""
+        <div class="img-card">
+            <div class="img-card-header">
+                <div class="img-card-dot-white"></div>
+                Original X-Ray
+            </div>
+            <div class="img-card-body">
+        """, unsafe_allow_html=True)
+        st.image(uploaded_file, use_column_width=True)
         st.markdown('</div></div>', unsafe_allow_html=True)
+
     with col2:
-        st.markdown(f'<div class="img-container"><div class="img-header">AI Heatmap — {LABELS[top_index]}</div><div class="img-body">', unsafe_allow_html=True)
-        st.image(result_img, width=320)
+        st.markdown(f"""
+        <div class="img-card">
+            <div class="img-card-header">
+                <div class="img-card-dot-red"></div>
+                AI Heatmap — {LABELS[top_index]}
+            </div>
+            <div class="img-card-body">
+        """, unsafe_allow_html=True)
+        st.image(result_img, use_column_width=True)
         st.markdown('</div></div>', unsafe_allow_html=True)
 
     # Results
@@ -311,36 +384,35 @@ if uploaded_file is not None:
     col_a, col_b = st.columns(2)
 
     with col_a:
-        st.markdown(f'<div class="section-card"><div class="results-header">Detected ({len(detected)})</div>', unsafe_allow_html=True)
-        for label, score in detected:
-            pct = int(score * 100)
-            st.markdown(f"""
-            <div class="finding-item">
-                <div class="finding-dot-red"></div>
-                <div class="finding-label">{label}</div>
-                <div class="bar-track"><div class="bar-fill-red" style="width:{pct}%"></div></div>
-                <div class="finding-score score-red">{pct}%</div>
+        rows_html = "".join([make_bar_row(l, s, "red") for l, s in detected])
+        st.markdown(f"""
+        <div class="results-card">
+            <div class="results-title">
+                Detected
+                <span class="count-badge-red">{len(detected)}</span>
             </div>
-            """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            {rows_html}
+        </div>
+        """, unsafe_allow_html=True)
 
     with col_b:
-        st.markdown(f'<div class="section-card"><div class="results-header">Not Detected ({len(not_detected)})</div>', unsafe_allow_html=True)
-        for label, score in not_detected:
-            pct = int(score * 100)
-            st.markdown(f"""
-            <div class="finding-item">
-                <div class="finding-dot-green"></div>
-                <div class="finding-label">{label}</div>
-                <div class="bar-track"><div class="bar-fill-green" style="width:{pct}%"></div></div>
-                <div class="finding-score score-green">{pct}%</div>
+        rows_html = "".join([make_bar_row(l, s, "green") for l, s in not_detected])
+        st.markdown(f"""
+        <div class="results-card">
+            <div class="results-title">
+                Not Detected
+                <span class="count-badge-green">{len(not_detected)}</span>
             </div>
-            """, unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+            {rows_html}
+        </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="disclaimer-box">
-        <p class="disclaimer-text">⚠️ For clinical assistance only. This AI analysis must be reviewed and confirmed by a qualified radiologist before any medical decision is made.</p>
+    <div class="disclaimer">
+        <div class="disclaimer-text">
+            ⚠️ For clinical assistance only. This AI analysis must be reviewed and confirmed
+            by a qualified radiologist before any medical decision is made.
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -352,6 +424,6 @@ else:
     <div class="empty-state">
         <div class="empty-icon">🫁</div>
         <div class="empty-title">Upload a chest X-ray to begin analysis</div>
-        <div class="empty-sub">Supports JPG, JPEG, PNG formats</div>
+        <div class="empty-sub">Supports JPG, JPEG, PNG · Max 200MB</div>
     </div>
     """, unsafe_allow_html=True)
